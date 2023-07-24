@@ -145,6 +145,28 @@ casttest!(cast_wallet_sign_typed_data_file, |_: TestProject, mut cmd: TestComman
     assert_eq!(output.trim(), "0x06c18bdc8163219fddc9afaf5a0550e381326474bb757c86dc32317040cf384e07a2c72ce66c1a0626b6750ca9b6c035bf6f03e7ed67ae2d1134171e9085c0b51b");
 });
 
+// tests that we can get list of addresses from keystore dir
+casttest!(
+    wallet_lists_addresses_in_keystore_with_password_file,
+    |_: TestProject, mut cmd: TestCommand| {
+        let keystore_dir =
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/managed-keystore");
+
+        cmd.args([
+            "wallet",
+            "ls",
+            "--keystore",
+            keystore_dir.to_str().unwrap(),
+            "--password-file",
+            keystore_dir.join("password").to_str().unwrap(),
+        ]);
+        let out = cmd.stdout_lossy();
+
+        assert!(out.contains("0xF7dD31CD6a9A3cC6e2399D220934F8CEFE406B8d"));
+        assert!(out.contains("0x2b70c6b9BBCfB60020443aeEE584F877Fb16D4eB"));
+    }
+);
+
 // tests that `cast estimate` is working correctly.
 casttest!(estimate_function_gas, |_: TestProject, mut cmd: TestCommand| {
     let eth_rpc_url = next_http_rpc_endpoint();

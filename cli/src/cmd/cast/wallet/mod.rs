@@ -180,7 +180,6 @@ impl WalletSubcommands {
             WalletSubcommands::Addresses { wallet } => {
                 let path = wallet.keystore_path.clone();
                 if let Some(path) = path {
-                    // println!("Searching accounts in `{}`", path);
                     let wallets = wallet.accounts().unwrap().unwrap();
 
                     if wallets.len() == 0 {
