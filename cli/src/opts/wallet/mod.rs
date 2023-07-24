@@ -22,6 +22,9 @@ use std::{
 };
 use tracing::{instrument, trace};
 
+pub mod keystore_wallet;
+pub use keystore_wallet::*;
+
 pub mod multi_wallet;
 pub use multi_wallet::*;
 

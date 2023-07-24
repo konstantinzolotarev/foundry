@@ -4,7 +4,7 @@ pub mod vanity;
 
 use crate::{
     cmd::{cast::wallet::vanity::VanityArgs, Cmd},
-    opts::Wallet,
+    opts::{KeystoreWallet, Wallet},
 };
 use cast::SimpleCast;
 use clap::Parser;
@@ -98,6 +98,13 @@ pub enum WalletSubcommands {
         #[clap(long, short)]
         address: Address,
     },
+
+    /// Lists addresses in given keystore.
+    #[clap(visible_alias = "ls")]
+    Addresses {
+        #[clap(flatten)]
+        wallet: KeystoreWallet,
+    },
 }
 
 impl WalletSubcommands {
@@ -168,6 +175,23 @@ impl WalletSubcommands {
                     Err(_) => {
                         println!("Validation failed. Address {address} did not sign this message.")
                     }
+                }
+            }
+            WalletSubcommands::Addresses { wallet } => {
+                let path = wallet.keystore_path.clone();
+                if let Some(path) = path {
+                    // println!("Searching accounts in `{}`", path);
+                    let wallets = wallet.accounts().unwrap().unwrap();
+
+                    if wallets.len() == 0 {
+                        println!("No accounts found in keystore `{}`", path)
+                    } else {
+                        for wallet in wallets {
+                            println!("{}", SimpleCast::to_checksum_address(&wallet.address()));
+                        }
+                    }
+                } else {
+                    eyre::bail!("Please provide keystore path !")
                 }
             }
         };
